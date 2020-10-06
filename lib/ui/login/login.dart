@@ -8,14 +8,16 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
+  int _operativa = 0; //0 --> Register, 1 --> Login
 
   @override
   void initState() {
     super.initState();
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(seconds: 1));
+    _animationController = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 2500));
 
-    _animationController.forward(from: 0.0);
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _animationController.forward(from: 0.0));
   }
 
   @override
@@ -31,9 +33,21 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         children: [
           SizedBox.expand(
             child: CustomPaint(
-              painter: BackgroudPainter(animation: _animationController.view),
+              painter: BackgroudPainter(
+                  animation: _animationController.view, operativa: _operativa),
             ),
-          )
+          ),
+          Positioned(
+            bottom: 20,
+            child: RaisedButton(
+                child: Text('Click...'),
+                onPressed: () {
+                  _animationController.forward(from: 0);
+                  setState(() {
+                    _operativa = _operativa == 0 ? 1 : 0;
+                  });
+                }),
+          ),
         ],
       ),
     );
