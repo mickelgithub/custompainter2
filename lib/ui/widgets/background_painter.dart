@@ -3,44 +3,52 @@ import 'dart:ui';
 import 'package:custompainter2/config/palette.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/rendering.dart';
+import 'dart:math';
 
 class BackgroudPainter extends CustomPainter {
-  final Paint vivazPaint;
-  final Paint ldaPaint;
-  final Paint aprecioPaint;
-  final Animation vivazAnimation;
-  final Animation ldaAnimation;
+  final Paint lightGreenPaint;
+  final Paint blackPaint;
 
-  final int _operativa;
+  final Animation animation;
+  // final Animation singUpAnimation;
 
-  BackgroudPainter({Animation<double> animation, int operativa})
-      : _operativa = operativa ?? 0,
-        vivazPaint = Paint()
-          ..color = Palette.vivaz
+  final int _action;
+
+  BackgroudPainter({Animation<double> animation, int action})
+      : _action = action ?? 0,
+        lightGreenPaint = Paint()
+          ..color = Palette.lightGreen
           ..style = PaintingStyle.fill,
-        ldaPaint = Paint()
-          ..color = Palette.lda
+        blackPaint = Paint()
+          ..color = Palette.black
           ..style = PaintingStyle.fill,
-        aprecioPaint = Paint()
-          ..color = Palette.aprecio
-          ..style = PaintingStyle.fill,
-        vivazAnimation =
-            CurvedAnimation(parent: animation, curve: Curves.elasticOut),
-        ldaAnimation =
-            CurvedAnimation(parent: animation, curve: Curves.elasticOut),
+        animation = Tween(begin: 0, end: pi).animate(CurvedAnimation(
+            parent: animation,
+            curve: Curves.elasticOut,
+            reverseCurve: Curves.bounceInOut)),
+        /*ldaAnimation = CurvedAnimation(
+            parent: animation,
+            curve: Curves.elasticOut,
+            reverseCurve: Curves.bounceIn),*/
         super(repaint: animation) {
     print('${this.hashCode}......');
   }
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (_operativa == 0) {
-      _paintVivaz(canvas, size);
-      _paintLda(canvas, size);
-    } else {
-      _paintLda(canvas, size);
-      _paintVivaz(canvas, size);
-    }
+    // if (_action == 0) {
+    //   _paintVivaz(canvas, size);
+    //   _paintLda(canvas, size);
+    // } else {
+    //   _paintLda(canvas, size);
+    //   _paintVivaz(canvas, size);
+    // }
+    _paintUpperRightShape(canvas, size, blackPaint);
+    _paintUpperLeftShape(canvas, size, blackPaint);
+    _paintUpperCenterShape(canvas, size, lightGreenPaint);
+    _paintLeftButtomShape(canvas, size, lightGreenPaint);
+    _paintRightButtomShape(canvas, size, blackPaint);
+    //_paintLda(canvas, size);
   }
 
   @override
@@ -48,46 +56,48 @@ class BackgroudPainter extends CustomPainter {
     return true;
   }
 
-  void _paintVivaz(Canvas canvas, Size size) {
-    /*final path = Path();
+  void _paintUpperRightShape(Canvas canvas, Size size, Paint paint) {
     final w = size.width;
     final h = size.height;
-    path.moveTo(w, h / 2);
-    path.lineTo(w, 0);
-    path.lineTo(0, 0);
-    path.cubicTo(
-        lerpDouble(w / 4, 0, vivazAnimation.value),
-        lerpDouble(h / 16, h / 8, vivazAnimation.value),
-        lerpDouble(3 * w / 4, w, vivazAnimation.value),
-        lerpDouble(3 * h / 8, h / 8, vivazAnimation.value),
-        w,
-        h / 4);
+    Path path = Path();
+    path.moveTo(w, 0);
+    path.lineTo(w, 0.22 * h);
+    path.quadraticBezierTo(w - 0.15 * w, 0.20 * h, w - 0.30 * w, 0);
     path.close();
-    canvas.drawPath(path, vivazPaint);*/
-    final w = size.width;
-    final h = size.height;
-    canvas.drawCircle(
-        Offset(w, 0),
-        lerpDouble(0, _operativa == 0 ? h / 8 : h / 2, vivazAnimation.value),
-        vivazPaint);
+
+    canvas.drawPath(path, paint);
   }
 
-  void _paintLda(Canvas canvas, Size size) {
-    /*final path = Path();
+  void _paintUpperLeftShape(Canvas canvas, Size size, Paint paint) {
     final w = size.width;
     final h = size.height;
-    path.moveTo(2 * w / 3, 0);
+    canvas.drawCircle(Offset(-w / 10, 0), 0.30 * h, paint);
+  }
+
+  void _paintUpperCenterShape(Canvas canvas, Size size, Paint paint) {
+    final w = size.width;
+    final h = size.height;
+    Path path = Path();
+    path.moveTo(w - 0.15 * w, 0);
+    path.quadraticBezierTo(
+        0.45 * w, 0.35 * h + sin(animation.value) * 0.05 * h, 0, 0.10 * h);
     path.lineTo(0, 0);
-    path.lineTo(0, h / 3);
-    path.quadraticBezierTo(lerpDouble(0, w / 2, ldaAnimation.value),
-        lerpDouble(0, h / 3, ldaAnimation.value), 2 * w / 3, 0);
     path.close();
-    canvas.drawPath(path, ldaPaint);*/
+
+    canvas.drawPath(path, paint);
+  }
+
+  void _paintLeftButtomShape(Canvas canvas, Size size, Paint paint) {
     final w = size.width;
     final h = size.height;
-    canvas.drawCircle(
-        Offset(0, 0),
-        lerpDouble(0, _operativa == 0 ? h / 2 : h / 8, ldaAnimation.value),
-        ldaPaint);
+    double radius = h / 40;
+    canvas.drawCircle(Offset(0, h - 2 * h / 40 - 10), radius, paint);
+  }
+
+  void _paintRightButtomShape(Canvas canvas, Size size, Paint paint) {
+    final w = size.width;
+    final h = size.height;
+    double radius = h / 10;
+    canvas.drawCircle(Offset(w + 10, h + 10), radius, paint);
   }
 }

@@ -8,13 +8,29 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   AnimationController _animationController;
-  int _operativa = 0; //0 --> Register, 1 --> Login
+  Animation delayedAnimationRegister;
+  Animation delayedAnimationLogin;
+  int _action = 0; //0 --> Register, 1 --> Login
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
-        vsync: this, duration: Duration(milliseconds: 2500));
+        vsync: this, duration: Duration(milliseconds: 1500));
+
+    delayedAnimationRegister = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(0.0, 0.1, curve: Curves.fastOutSlowIn)));
+
+    delayedAnimationLogin = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(0.0, 0.1, curve: Curves.fastOutSlowIn)));
 
     WidgetsBinding.instance
         .addPostFrameCallback((_) => _animationController.forward(from: 0.0));
@@ -28,24 +44,24 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
       body: Stack(
         children: [
           SizedBox.expand(
             child: CustomPaint(
               painter: BackgroudPainter(
-                  animation: _animationController.view, operativa: _operativa),
+                  animation: _animationController.view, action: _action),
             ),
           ),
           Positioned(
             bottom: 20,
+            right: 150,
             child: RaisedButton(
                 child: Text('Click...'),
                 onPressed: () {
                   _animationController.forward(from: 0);
-                  setState(() {
-                    _operativa = _operativa == 0 ? 1 : 0;
-                  });
+                  setState(() {});
                 }),
           ),
         ],
